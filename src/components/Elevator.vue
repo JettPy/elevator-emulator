@@ -1,6 +1,6 @@
 <template>
   <div class="shaft">
-    <div class="lift"></div>
+    <div class="lift" :style="style"></div>
   </div>
 </template>
 
@@ -8,7 +8,27 @@
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Elevator'
+  name: 'Elevator',
+  props: {
+    floorCount: Number,
+    updatePosition: Function
+  },
+  data() {
+    return {
+      currPosition: 1,
+      isResting: false
+    }
+  },
+  computed: {
+    style() {
+      return {
+        "height": `calc(100% / ${this.floorCount})`
+      }
+    }
+  },
+  methods: {
+
+  }
 }
 </script>
 
@@ -22,13 +42,14 @@ export default {
   background-color: beige;
   border: solid black 1px;
   box-sizing: border-box;
-  display: grid;
-  grid-template-rows: repeat(5, 1fr);
+  position: relative;
 }
 
 .lift {
+  width: 100%;
   background-color: brown;
-  grid-row-start: 5;
+  position: absolute;
+  bottom: 0;
 }
 
 @media screen and (max-width: 800px) {
