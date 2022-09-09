@@ -1,8 +1,10 @@
 <template>
   <div class="floor">
     <p class="floor__caption">{{ this.floorNumber }}</p>
-    <button v-if="isClicked" disabled class="floor__button floor__button_clicked" @click="clickedFloor"></button>
-    <button v-else class="floor__button" @click="clickedFloor"></button>
+    <button class="floor__button"
+      :class="{floor__button_clicked: isClicked}"
+      @click="buttonClick">
+    </button>
   </div>
 </template>
 
@@ -13,20 +15,12 @@ export default {
   name: "Floor",
   props: {
     floorNumber: Number,
-    addFloor: Function,
-    checkLift: Function
-  },
-  data() {
-    return {
-      isClicked: false
-    }
+    handleButtonClick: Function,
+    isClicked: Boolean
   },
   methods: {
-    clickedFloor() {
-      if (!this.checkLift(this.floorNumber)) {
-        this.isClicked = true;
-        this.addFloor(this.floorNumber);
-      }
+    buttonClick() {
+      this.handleButtonClick(this.floorNumber);
     }
   }
 }
@@ -34,6 +28,7 @@ export default {
 
 <style>
 .floor {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

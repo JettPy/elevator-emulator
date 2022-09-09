@@ -1,6 +1,10 @@
 <template>
-  <div class="shaft">
-    <div class="lift" :style="style"></div>
+  <div class="shaft" :style="style_shaft">
+    <div class="lift" 
+      :style="style_lift"
+      :class="{lift_resting: isResting}"
+    >
+    </div>
   </div>
 </template>
 
@@ -11,23 +15,54 @@ export default {
   name: 'Elevator',
   props: {
     floorCount: Number,
-    updatePosition: Function
+    handleElevatorArrival: Function,
+    targetFloor: Number
   },
   data() {
     return {
       currPosition: 1,
-      isResting: false
+      isResting: false,
+      time: 0
     }
   },
   computed: {
-    style() {
+    style_lift() {
       return {
-        "height": `calc(100% / ${this.floorCount})`
+        "bottom": `${(this.currPosition - 1) * 120}px`,
+        "transition": `bottom ${this.time}s linear`
+      }
+    },
+    style_shaft() {
+      return {
+        "height": `${120 * this.floorCount}px`
       }
     }
   },
   methods: {
+    elevatorArrive() {
+      this.handleElevatorArrival();
+      this.isResting = true;
+      setTimeout(()=>{
+        this.isResting = false;
+      }, 3000)
+    },
+    elevatorMove(targetFloor) {
+      let distance = targetFloor - this.currPosition;
+      this.time = Math.abs(distance);
+      this.currPosition += distance;
+      setTimeout(() => {
+        this.elevatorArrive();
+        console.log(`Выполнено за ${this.time * 1000}`)
+      }, this.time * 1000);
 
+    }
+  },
+  watch: {
+    targetFloor: {
+      handler() {
+        this.elevatorMove(this.targetFloor);
+      }
+    }
   }
 }
 </script>
@@ -36,7 +71,6 @@ export default {
 .shaft {
   width: 200px;
   min-width: 30px;
-  height: calc(100% - 40px);
   margin: auto 0;
   margin-left: 20px;
   background-color: beige;
@@ -47,9 +81,29 @@ export default {
 
 .lift {
   width: 100%;
+  height: 120px;
   background-color: brown;
   position: absolute;
-  bottom: 0;
+}
+
+.lift_resting {
+  animation-name: blink;
+  animation-timing-function: linear;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0.75;
+  }
 }
 
 @media screen and (max-width: 800px) {

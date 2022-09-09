@@ -1,6 +1,11 @@
 <template>
-  <div class="button-bar">
-    <Floor v-for="i in this.floorCount" :key="i - 1" v-bind:addFloor="this.addFloor" v-bind:floorNumber="this.floorCount - i + 1" v-bind:checkLift="this.checkLift" />
+  <div class="button-bar" :style="style_bar">
+    <Floor
+      v-for="i in this.floorCount" :key="i - 1"
+      v-bind:floorNumber="i"
+      v-bind:handleButtonClick="this.handleButtonClick"
+      v-bind:isClicked="this.isClicked[i - 1]"
+    />
   </div>
 </template>
 
@@ -8,26 +13,33 @@
 import Floor from './Floor.vue';
 
 export default {
-    name: "ButtonBar",
-    components: {
-      Floor
-    },
-    props: {
-      floorCount: Number,
-      addFloor: Function,
-      checkLift: Function
+  name: "ButtonBar",
+  components: {
+    Floor
+  },
+  props: {
+    floorCount: Number,
+    handleButtonClick: Function,
+    isClicked: Array
+  },
+  computed: {
+    style_bar() {
+      return {
+        "height": `${120 * this.floorCount}px`
+      }
     }
+  },
 }
 </script>
 
 <style>
 .button-bar {
-  height: calc(100% - 40px);
   width: 150px;
   min-width: 20px;
   margin: auto 20px;
   background-color: coral;
-  display: grid;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 @media screen and (max-width: 800px) {

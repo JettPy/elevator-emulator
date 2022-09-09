@@ -1,6 +1,14 @@
 <template>
-  <Elevator v-for="i in this.elevatorsCount" :key="i - 1" v-bind:floorCount="this.floorCount" v-bind:updatePosition="this.updatePosition"/>
-  <ButtonBar v-bind:floorCount="this.floorCount" v-bind:addFloor="this.addFloorToQueue" v-bind:checkLift="this.checkLiftOnFloor"/>
+  <Elevator
+    v-bind:floorCount="this.floorCount"
+    v-bind:handleElevatorArrival="this.handleElevatorArrival"
+    v-bind:targetFloor="this.targetFloor"
+  />
+  <ButtonBar
+    v-bind:floorCount="this.floorCount"
+    v-bind:handleButtonClick="this.handleButtonClick"
+    v-bind:isClicked="this.isClicked"
+  />
 </template>
 
 <script>
@@ -15,40 +23,44 @@ export default {
   },
   data() {
     return {
-      elevatorsCount: 5,
-      floorCount: 5,
-      queue: [],
-      queueLen: 0,
-      positions: []
+      floorCount: 7,
+      floorRequestQueue: [],
+      liftPosition: 1,
+      isClicked: [],
+      targetFloor: null
     };
   },
   created() {
-    for (let i = 0; i < this.elevatorsCount; i++) {
-      this.positions.push(1);
+    for (let i = 0; i < this.floorCount; i++) {
+      this.isClicked.push(false);
     }
-    console.log(this.positions);
   },
   methods: {
-    addFloorToQueue(floorNumber) {
-      this.queue.push(floorNumber);
-      this.queueLen += 1;
-      console.log(this.queue);
+    handleButtonClick(floorNumber) {
+      if (this.isClicked[floorNumber - 1] || this.liftPosition == floorNumber) {
+        return;
+      }
+      this.isClicked[floorNumber - 1] = true;
+      this.floorRequestQueue.push(floorNumber);
     },
-    deliteFloorFromQueue() {
-      this.queue.shift();
-      this.queueLen -= 1;
-      console.log(this.queue);
+    handleElevatorArrival(floor) {
+      this.liftPosition = floor;
+      this.isClicked[this.liftPosition - 1] = false;
+      //запуск анимации отдыха + обновление статуса лифта
     },
-    updatePosition(lift, floor) {
-      this.positions[lift] = floor;
-    },
-    checkLiftOnFloor(floorNumber) {
-      return this.positions.some((_, i) => floorNumber == this.positions[i])
+    handleElevatorMove(targetFloor) {
+      this.targetFloor = targetFloor;
+      console.log(targetFloor)
+      setTimeout(this.handleElevatorArrival, 3000, targetFloor);
     }
   },
   watch: {
-    queueLen(value) {
-      console.log(`Effect ${value}`);
+    floorRequestQueue: {
+      handler() {
+        if (this.floorRequestQueue.length > 0)
+          this.handleElevatorMove(this.floorRequestQueue.shift());
+      },
+      deep:true
     }
   }
 }
@@ -62,7 +74,8 @@ export default {
 }
 
 #app {
-  height: 100vh;
+  padding-top: 20px;
+  padding-bottom: 20px;
   display: flex;
   background-color: burlywood;
 }
