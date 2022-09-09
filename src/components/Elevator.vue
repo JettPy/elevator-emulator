@@ -35,6 +35,12 @@ export default {
     if (lift) {
       this.currPosition = lift;
     }
+    let queue = JSON.parse(localStorage.getItem("queue"));
+    if (queue) {
+      if (queue.length) {
+        this.isActive = true;
+      }
+    }
   },
   computed: {
     style_lift() {
@@ -51,7 +57,6 @@ export default {
   },
   methods: {
     elevatorArrive() {
-      localStorage.setItem("lift", JSON.stringify(this.currPosition));
       this.isResting = true;
       this.message = 'waiting';
       setTimeout(()=>{

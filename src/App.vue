@@ -30,12 +30,21 @@ export default {
     };
   },
   created() {
-    for (let i = 0; i < this.floorCount; i++) {
-      this.isClicked.push(false);
-    }
     let lift = JSON.parse(localStorage.getItem("lift"));
     if (lift) {
       this.liftPosition = lift;
+    }
+    let queue = JSON.parse(localStorage.getItem("queue"));
+    if (queue) {
+      this.floorRequestQueue = queue;
+    }
+    let clicks = JSON.parse(localStorage.getItem("clicks"));
+    if (clicks) {
+      this.isClicked = clicks;
+    } else {
+      for (let i = 0; i < this.floorCount; i++) {
+        this.isClicked.push(false);
+      }
     }
   },
   methods: {
@@ -46,12 +55,19 @@ export default {
       this.liftPosition = 0;
       this.isClicked[floorNumber - 1] = true;
       this.floorRequestQueue.push(floorNumber);
+      this.saveData();
     },
     handleElevatorArrival(floor) {
       this.liftPosition = floor;
       this.isClicked[this.liftPosition - 1] = false;
       this.floorRequestQueue.shift();
+      this.saveData();
     },
+    saveData() {
+      localStorage.setItem("lift", JSON.stringify(this.liftPosition));
+      localStorage.setItem("queue", JSON.stringify(this.floorRequestQueue));
+      localStorage.setItem("clicks", JSON.stringify(this.isClicked));
+    }
   }
 }
 </script>
