@@ -25,13 +25,17 @@ export default {
     return {
       floorCount: 7,
       floorRequestQueue: [],
-      liftPosition: 1,
+      liftPosition: 5,
       isClicked: []
     };
   },
   created() {
     for (let i = 0; i < this.floorCount; i++) {
       this.isClicked.push(false);
+    }
+    let lift = JSON.parse(localStorage.getItem("lift"));
+    if (lift) {
+      this.liftPosition = lift;
     }
   },
   methods: {

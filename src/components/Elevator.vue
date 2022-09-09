@@ -22,12 +22,18 @@ export default {
   data() {
     return {
       message: '',
-      currPosition: 1,
+      currPosition: 5,
       isResting: false,
       isMoving: false,
       time: 0,
       isActive: false,
       checker: null
+    }
+  },
+  created() {
+    let lift = JSON.parse(localStorage.getItem("lift"));
+    if (lift) {
+      this.currPosition = lift;
     }
   },
   computed: {
@@ -45,6 +51,7 @@ export default {
   },
   methods: {
     elevatorArrive() {
+      localStorage.setItem("lift", JSON.stringify(this.currPosition));
       this.isResting = true;
       this.message = 'waiting';
       setTimeout(()=>{
