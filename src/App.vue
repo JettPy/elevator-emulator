@@ -2,7 +2,7 @@
   <Elevator
     v-bind:floorCount="this.floorCount"
     v-bind:handleElevatorArrival="this.handleElevatorArrival"
-    v-bind:targetFloor="this.targetFloor"
+    v-bind:floorRequestQueue="this.floorRequestQueue"
   />
   <ButtonBar
     v-bind:floorCount="this.floorCount"
@@ -25,6 +25,7 @@ export default {
     return {
       floorCount: 7,
       floorRequestQueue: [],
+      isElevatorMoving: false,
       liftPosition: 1,
       isClicked: [],
       targetFloor: null
@@ -37,7 +38,7 @@ export default {
   },
   methods: {
     handleButtonClick(floorNumber) {
-      if (this.isClicked[floorNumber - 1] || this.liftPosition == floorNumber) {
+      if ((this.isClicked[floorNumber - 1] || this.liftPosition == floorNumber) && !this.isElevatorMoving) {
         return;
       }
       this.isClicked[floorNumber - 1] = true;
@@ -46,22 +47,9 @@ export default {
     handleElevatorArrival(floor) {
       this.liftPosition = floor;
       this.isClicked[this.liftPosition - 1] = false;
+      this.floorRequestQueue.shift();
       //запуск анимации отдыха + обновление статуса лифта
     },
-    handleElevatorMove(targetFloor) {
-      this.targetFloor = targetFloor;
-      console.log(targetFloor)
-      setTimeout(this.handleElevatorArrival, 3000, targetFloor);
-    }
-  },
-  watch: {
-    floorRequestQueue: {
-      handler() {
-        if (this.floorRequestQueue.length > 0)
-          this.handleElevatorMove(this.floorRequestQueue.shift());
-      },
-      deep:true
-    }
   }
 }
 </script>

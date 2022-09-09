@@ -4,6 +4,7 @@
       :style="style_lift"
       :class="{lift_resting: isResting}"
     >
+    <p class="lift__display">{{ message }}</p>
     </div>
   </div>
 </template>
@@ -16,10 +17,11 @@ export default {
   props: {
     floorCount: Number,
     handleElevatorArrival: Function,
-    targetFloor: Number
+    floorRequestQueue: Array
   },
   data() {
     return {
+      message: '',
       currPosition: 1,
       isResting: false,
       time: 0
@@ -39,35 +41,50 @@ export default {
     }
   },
   methods: {
-    elevatorArrive() {
-      this.handleElevatorArrival();
+    async elevatorArrive() {
       this.isResting = true;
-      setTimeout(()=>{
+      this.message = '';
+      await setTimeout(()=>{
         this.isResting = false;
+        this.handleElevatorArrival(this.currPosition);
       }, 3000)
     },
-    elevatorMove(targetFloor) {
+    async elevatorMove(targetFloor) {
       let distance = targetFloor - this.currPosition;
+      if (distance > 0) {
+        this.message = targetFloor + ' up'
+      } else {
+        this.message = targetFloor + ' down'
+      }
       this.time = Math.abs(distance);
       this.currPosition += distance;
-      setTimeout(() => {
+      await setTimeout(() => {
         this.elevatorArrive();
         console.log(`Выполнено за ${this.time * 1000}`)
       }, this.time * 1000);
-
+    }, 
+    async checkIsResting() {
+      return this.isResting;
     }
   },
   watch: {
-    targetFloor: {
-      handler() {
-        this.elevatorMove(this.targetFloor);
-      }
+    floorRequestQueue: {
+      async handler() {
+        console.log(this.floorRequestQueue)
+        if (this.floorRequestQueue.length == 0)
+          return
+        let state = await this.checkIsResting();
+        if (!state) {
+          await this.elevatorMove(this.floorRequestQueue[0]);
+        }
+      },
+      deep: true
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .shaft {
   width: 200px;
   min-width: 30px;
@@ -93,6 +110,17 @@ export default {
   animation-iteration-count: infinite;
 }
 
+.lift__display {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: auto;
+  background-color:aqua;
+  text-align: center;
+  width: 45%;
+  height: 20px;
+}
+
 @keyframes blink {
   0%,
   50%,
@@ -114,6 +142,10 @@ export default {
 
   .shaft:first-child {
     margin-left: 10px;
+  }
+  
+  .lift__display {
+    font-size: 10px;
   }
 
 }

@@ -32,7 +32,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .button-bar {
   width: 150px;
   min-width: 20px;
