@@ -22,7 +22,7 @@ export default {
   data() {
     return {
       message: '',
-      currPosition: 5,
+      currPosition: 1,
       isResting: false,
       isMoving: false,
       time: 0,

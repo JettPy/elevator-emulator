@@ -25,7 +25,7 @@ export default {
     return {
       floorCount: 7,
       floorRequestQueue: [],
-      liftPosition: 5,
+      liftPosition: 1,
       isClicked: []
     };
   },
