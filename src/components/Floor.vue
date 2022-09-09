@@ -38,23 +38,22 @@ export default {
 }
 
 .floor__caption {
+  margin-bottom: 40px;
   font-size: 20px;
   font-weight: 900;
-  color: maroon;
-  margin-bottom: 40px;
   font-family: Arial, Helvetica, sans-serif;
+  color: #3b434c;
 }
 
 .floor__button {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: lawngreen;
+  background-color: #38e541;
   cursor: pointer;
 }
 
 .floor__button_clicked {
-  background-color: crimson;
-  
+  background-color: #F7554A;
 }
 </style>

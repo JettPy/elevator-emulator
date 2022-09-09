@@ -25,10 +25,8 @@ export default {
     return {
       floorCount: 7,
       floorRequestQueue: [],
-      isElevatorMoving: false,
       liftPosition: 1,
-      isClicked: [],
-      targetFloor: null
+      isClicked: []
     };
   },
   created() {
@@ -38,9 +36,10 @@ export default {
   },
   methods: {
     handleButtonClick(floorNumber) {
-      if ((this.isClicked[floorNumber - 1] || this.liftPosition == floorNumber) && !this.isElevatorMoving) {
+      if (this.isClicked[floorNumber - 1] || this.liftPosition == floorNumber) {
         return;
       }
+      this.liftPosition = 0;
       this.isClicked[floorNumber - 1] = true;
       this.floorRequestQueue.push(floorNumber);
     },
@@ -48,7 +47,6 @@ export default {
       this.liftPosition = floor;
       this.isClicked[this.liftPosition - 1] = false;
       this.floorRequestQueue.shift();
-      //запуск анимации отдыха + обновление статуса лифта
     },
   }
 }
@@ -64,7 +62,9 @@ export default {
 #app {
   padding-top: 20px;
   padding-bottom: 20px;
+  min-height: calc(100vh);
   display: flex;
-  background-color: burlywood;
+  background-color: #92c3ff;
+  box-sizing:border-box;
 }
 </style>

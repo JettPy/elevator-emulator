@@ -24,7 +24,10 @@ export default {
       message: '',
       currPosition: 1,
       isResting: false,
-      time: 0
+      isMoving: false,
+      time: 0,
+      isActive: false,
+      checker: null
     }
   },
   computed: {
@@ -41,15 +44,16 @@ export default {
     }
   },
   methods: {
-    async elevatorArrive() {
+    elevatorArrive() {
       this.isResting = true;
-      this.message = '';
-      await setTimeout(()=>{
+      this.message = 'waiting';
+      setTimeout(()=>{
         this.isResting = false;
+        this.message = '';
         this.handleElevatorArrival(this.currPosition);
       }, 3000)
     },
-    async elevatorMove(targetFloor) {
+    elevatorMove(targetFloor) {
       let distance = targetFloor - this.currPosition;
       if (distance > 0) {
         this.message = targetFloor + ' up'
@@ -58,27 +62,30 @@ export default {
       }
       this.time = Math.abs(distance);
       this.currPosition += distance;
-      await setTimeout(() => {
+      this.isMoving = true;
+      setTimeout(() => {
         this.elevatorArrive();
-        console.log(`Выполнено за ${this.time * 1000}`)
+        this.isMoving = false;
       }, this.time * 1000);
-    }, 
-    async checkIsResting() {
-      return this.isResting;
     }
   },
   watch: {
     floorRequestQueue: {
-      async handler() {
-        console.log(this.floorRequestQueue)
-        if (this.floorRequestQueue.length == 0)
-          return
-        let state = await this.checkIsResting();
-        if (!state) {
-          await this.elevatorMove(this.floorRequestQueue[0]);
-        }
+      handler() {
+        this.isActive = !(this.floorRequestQueue.length == 0);
       },
       deep: true
+    },
+    isActive(value) {
+      if (value) {
+        this.checker = setInterval(() => {
+          if (this.isResting || this.isMoving)
+            return;
+          this.elevatorMove(this.floorRequestQueue[0]);
+        }, 100);
+      } else {
+        clearInterval(this.checker)
+      }
     }
   }
 }
@@ -86,11 +93,11 @@ export default {
 
 <style scoped>
 .shaft {
-  width: 200px;
-  min-width: 30px;
   margin: auto 0;
   margin-left: 20px;
-  background-color: beige;
+  width: 200px;
+  min-width: 30px;
+  background-color: #02244e;
   border: solid black 1px;
   box-sizing: border-box;
   position: relative;
@@ -99,26 +106,24 @@ export default {
 .lift {
   width: 100%;
   height: 120px;
-  background-color: brown;
+  background-color: #0A74F5;
   position: absolute;
 }
 
 .lift_resting {
-  animation-name: blink;
-  animation-timing-function: linear;
-  animation-duration: 1.5s;
-  animation-iteration-count: infinite;
+  animation: 1.5s infinite linear blink
 }
 
 .lift__display {
+  margin: auto;
+  width: 45%;
+  height: 20px;
   font-size: 14px;
   font-weight: 600;
   font-family: Arial, Helvetica, sans-serif;
-  margin: auto;
-  background-color:aqua;
   text-align: center;
-  width: 45%;
-  height: 20px;
+  color: #c01509;
+  background-color:#aed1fc;
 }
 
 @keyframes blink {
@@ -127,15 +132,14 @@ export default {
   100% {
     opacity: 1;
   }
-
   25%,
   75% {
     opacity: 0.75;
+    background-color:#0af597;
   }
 }
 
 @media screen and (max-width: 800px) {
-
   .shaft {
     margin-left: 0px;
   }
@@ -147,6 +151,5 @@ export default {
   .lift__display {
     font-size: 10px;
   }
-
 }
 </style>

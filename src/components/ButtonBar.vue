@@ -34,12 +34,14 @@ export default {
 
 <style scoped>
 .button-bar {
+  margin: auto 20px;
+  margin-top: max(auto, 20px);
+  margin-bottom: max(auto, 20px);
   width: 150px;
   min-width: 20px;
-  margin: auto 20px;
-  background-color: coral;
   display: flex;
   flex-direction: column-reverse;
+  background-color: #3d92fa;
 }
 
 @media screen and (max-width: 800px) {
