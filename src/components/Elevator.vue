@@ -2,7 +2,7 @@
   <div class="shaft" :style="style_shaft">
     <div class="lift" 
       :style="style_lift"
-      :class="{lift_resting: isResting}"
+      :class="{lift_resting: this.isResting}"
     >
     <p class="lift__display">{{ message }}</p>
     </div>
@@ -15,31 +15,33 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Elevator',
   props: {
+    index: Number,
     floorCount: Number,
     handleElevatorArrival: Function,
-    floorRequestQueue: Array
+    floorRequestQueue: Array,
+    liftIndex: Number,
+    setIsMoving: Function,
+    isResting: Boolean,
+    setIsResting: Function,
+    handleGetFist: Function,
+    setLiftPosition: Function,
+    currPosition: Number,
+    toggler: Boolean,
+    handleElevatorMoving: Function,
+    targetFloor: Number,
+    setTargetFloor: Function,
+    saveTargets: Function
   },
   data() {
     return {
       message: '',
-      currPosition: 1,
-      isResting: false,
-      isMoving: false,
       time: 0,
-      isActive: false,
-      checker: null
+      checker: null,
     }
   },
   created() {
-    let lift = JSON.parse(localStorage.getItem("lift"));
-    if (lift) {
-      this.currPosition = lift;
-    }
-    let queue = JSON.parse(localStorage.getItem("queue"));
-    if (queue) {
-      if (queue.length) {
-        this.isActive = true;
-      }
+    if (this.targetFloor) {
+      this.elevatorMove(this.targetFloor)
     }
   },
   computed: {
@@ -57,15 +59,24 @@ export default {
   },
   methods: {
     elevatorArrive() {
-      this.isResting = true;
+      this.setIsResting(true, this.index);
       this.message = 'waiting';
       setTimeout(()=>{
-        this.isResting = false;
+        this.setIsResting(false, this.index);
         this.message = '';
-        this.handleElevatorArrival(this.currPosition);
+        this.handleElevatorArrival(this.currPosition, this.index);
+        this.setTargetFloor(null, this.index);
+        this.saveTargets();
       }, 3000)
     },
     elevatorMove(targetFloor) {
+      if (!targetFloor) {
+        return;
+      }
+      if (this.targetFloor == null)
+        this.setTargetFloor(this.handleGetFist(), this.index);
+      this.saveTargets();
+      this.handleElevatorMoving(this.index);
       let distance = targetFloor - this.currPosition;
       if (distance > 0) {
         this.message = targetFloor + ' up'
@@ -73,30 +84,20 @@ export default {
         this.message = targetFloor + ' down'
       }
       this.time = Math.abs(distance);
-      this.currPosition += distance;
-      this.isMoving = true;
+      this.setLiftPosition(this.currPosition + distance, this.index);
+      this.setIsMoving(true, this.index);
       setTimeout(() => {
         this.elevatorArrive();
-        this.isMoving = false;
+        this.setIsMoving(false, this.index);
+        this.setTargetFloor(null, this.index);
       }, this.time * 1000);
     }
   },
   watch: {
-    floorRequestQueue: {
-      handler() {
-        this.isActive = !(this.floorRequestQueue.length == 0);
-      },
-      deep: true
-    },
-    isActive(value) {
-      if (value) {
-        this.checker = setInterval(() => {
-          if (this.isResting || this.isMoving)
-            return;
-          this.elevatorMove(this.floorRequestQueue[0]);
-        }, 100);
-      } else {
-        clearInterval(this.checker)
+    toggler() {
+      if (this.index == this.liftIndex) {
+        this.setTargetFloor(this.floorRequestQueue[0], this.index);
+        this.elevatorMove(this.floorRequestQueue[0]);
       }
     }
   }
