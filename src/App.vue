@@ -57,12 +57,6 @@ export default {
         this.isClicked.push(false);
       }
     }
-    if (queue.length == 0) {
-      this.isClicked = [];
-      for (let i = 0; i < this.floorCount; i++) {
-        this.isClicked.push(false);
-      }
-    }
   },
   methods: {
     handleGetFist() {
